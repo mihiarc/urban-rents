@@ -367,9 +367,9 @@ def main() -> int:
     )
     download_panel_parser.add_argument(
         "--preset",
-        choices=["standard", "extended", "annual"],
+        choices=["standard", "extended", "full_annual", "maximum", "milestones", "five_year_only"],
         default="standard",
-        help="Panel preset (default: standard = 2013,2018,2023)",
+        help="Panel preset: standard (2013,2018,2023), full_annual (2000-2023), maximum, milestones, etc.",
     )
     download_panel_parser.add_argument(
         "--state",
@@ -402,7 +402,7 @@ def main() -> int:
     )
     pums_panel_parser.add_argument(
         "--preset",
-        choices=["standard", "extended", "annual"],
+        choices=["standard", "extended", "full_annual", "maximum", "milestones", "five_year_only"],
         default="standard",
         help="Panel preset",
     )
@@ -427,7 +427,7 @@ def main() -> int:
     )
     crosswalk_panel_parser.add_argument(
         "--preset",
-        choices=["standard", "extended", "annual"],
+        choices=["standard", "extended", "full_annual", "maximum", "milestones", "five_year_only"],
         default="standard",
         help="Panel preset",
     )
@@ -452,7 +452,7 @@ def main() -> int:
     )
     panel_parser.add_argument(
         "--preset",
-        choices=["standard", "extended", "annual"],
+        choices=["standard", "extended", "full_annual", "maximum", "milestones", "five_year_only"],
         default="standard",
         help="Panel preset (default: standard)",
     )
@@ -503,7 +503,7 @@ def main() -> int:
     )
     panel_pipeline_parser.add_argument(
         "--preset",
-        choices=["standard", "extended", "annual"],
+        choices=["standard", "extended", "full_annual", "maximum", "milestones", "five_year_only"],
         default="standard",
         help="Panel preset",
     )
