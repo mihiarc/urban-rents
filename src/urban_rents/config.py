@@ -27,15 +27,17 @@ FIVE_YEAR_PUMS_YEARS: Final[list[int]] = list(range(2009, 2024))  # 2009-2023
 AVAILABLE_SURVEY_YEARS: Final[list[int]] = ONE_YEAR_PUMS_YEARS + FIVE_YEAR_PUMS_YEARS
 
 # PUMA vintage configuration
-# 2000 PUMAs: Used for 1-year ACS 2000-2008 and 5-year ACS 2009-2012
-# 2010 PUMAs: Used for ACS 2013-2021 (2009-2013 through 2017-2021 5-year)
+# NOTE: 2000 PUMAs are no longer available from Census TIGER. Using 2010 PUMAs
+# as approximation for 2000-2012 survey years. This introduces some geographic
+# mismatch but allows processing of the full time series.
+# 2010 PUMAs: Used for ACS 2000-2021 (substituting for unavailable 2000 PUMAs)
 # 2020 PUMAs: Used for ACS from 2022 onward (2018-2022 5-year and later)
 PUMA_VINTAGE_MAPPING: Final[dict[int, str]] = {
-    # 1-year PUMS (2000-2008) all use 2000 PUMAs
-    2000: "2000", 2001: "2000", 2002: "2000", 2003: "2000", 2004: "2000",
-    2005: "2000", 2006: "2000", 2007: "2000", 2008: "2000",
-    # 5-year PUMS (2009-2012) use 2000 PUMAs
-    2009: "2000", 2010: "2000", 2011: "2000", 2012: "2000",
+    # 1-year PUMS (2000-2008) - using 2010 PUMAs as 2000 PUMAs unavailable
+    2000: "2010", 2001: "2010", 2002: "2010", 2003: "2010", 2004: "2010",
+    2005: "2010", 2006: "2010", 2007: "2010", 2008: "2010",
+    # 5-year PUMS (2009-2012) - using 2010 PUMAs as 2000 PUMAs unavailable
+    2009: "2010", 2010: "2010", 2011: "2010", 2012: "2010",
     # 5-year PUMS (2013-2021) use 2010 PUMAs
     2013: "2010", 2014: "2010", 2015: "2010", 2016: "2010", 2017: "2010",
     2018: "2010", 2019: "2010", 2020: "2010", 2021: "2010",
