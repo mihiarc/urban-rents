@@ -95,12 +95,13 @@ def load_pums_housing_file(state_fips: str, survey_year: int | None = None) -> p
         )
 
     # Column names vary by year - read all possible variants
-    # STATE vs ST, YRBLT vs YBL, PUMA vs PUMA10 vs PUMA00
+    # STATE vs ST, YRBLT vs YBL, PUMA vs PUMA10 vs PUMA00 vs PUMA20
     columns_to_read = [
         "SERIALNO",  # Unique identifier
         "STATE",     # State code (2022+)
         "ST",        # State code (pre-2022)
         "PUMA",      # PUMA code (2012+)
+        "PUMA20",    # 2020 PUMA code (2022+ files)
         "PUMA10",    # 2010 PUMA code (2013-2021 files may have this)
         "PUMA00",    # 2000 PUMA code (older files)
         "WGTP",      # Housing unit weight
@@ -120,6 +121,7 @@ def load_pums_housing_file(state_fips: str, survey_year: int | None = None) -> p
             "STATE": str,
             "ST": str,
             "PUMA": str,
+            "PUMA20": str,
             "PUMA10": str,
             "PUMA00": str,
             "WGTP": float,
@@ -187,20 +189,30 @@ def load_pums_housing_file(state_fips: str, survey_year: int | None = None) -> p
 
     # PUMA column: Use appropriate vintage
     # For older ACS files with both PUMA00 and PUMA10, select the appropriate vintage
+    # For newer files (2022+), PUMA20 contains 2020 vintage codes
     if "PUMA" not in df.columns:
-        if puma_vintage == "2010" and "PUMA10" in df.columns:
+        if puma_vintage == "2020" and "PUMA20" in df.columns:
+            # For 2020 vintage (2022+ surveys), use PUMA20
+            df = df.rename(columns={"PUMA20": "PUMA"})
+            # Filter out records with missing PUMA (coded as -9)
+            df = df[df["PUMA"] != "-9"].copy()
+        elif puma_vintage == "2010" and "PUMA10" in df.columns:
             # For 2010 vintage, use PUMA10 and filter out missing values (-9)
             df = df.rename(columns={"PUMA10": "PUMA"})
             # Filter out records with missing PUMA (coded as -9)
-            df = df[df["PUMA"] != -9].copy()
+            df = df[df["PUMA"] != "-9"].copy()
         elif puma_vintage == "2000" and "PUMA00" in df.columns:
             # For 2000 vintage, use PUMA00
             df = df.rename(columns={"PUMA00": "PUMA"})
-            df = df[df["PUMA"] != -9].copy()
+            df = df[df["PUMA"] != "-9"].copy()
+        elif "PUMA10" in df.columns:
+            # Fall back to PUMA10 if available
+            df = df.rename(columns={"PUMA10": "PUMA"})
+            df = df[df["PUMA"] != "-9"].copy()
         elif "PUMA00" in df.columns:
             # Fall back to PUMA00 if no other option
             df = df.rename(columns={"PUMA00": "PUMA"})
-            df = df[df["PUMA"] != -9].copy()
+            df = df[df["PUMA"] != "-9"].copy()
 
     # Standardize state FIPS to 2 digits
     if "ST" in df.columns:
@@ -266,15 +278,20 @@ def get_recent_built_codes(survey_year: int) -> list:
     Returns:
         List of YRBLT/YBL codes to include (may be int or str depending on vintage)
     """
-    if survey_year >= 2022:
-        # 2022+ uses new YRBLT coding with decade and individual years
-        return ["2010", "2020", "2021", "2022", "2023"]
+    if survey_year >= 2021:
+        # 2021+ ACS uses new YRBLT coding with decade and individual years
+        # "2010" represents 2010-2019 decade, then individual years 2020, 2021, etc.
+        # Include years up to the survey end year
+        recent_codes = ["2010"]  # 2010-2019 decade
+        for year in range(2020, survey_year + 1):
+            recent_codes.append(str(year))
+        return recent_codes
 
     elif survey_year >= 2018:
-        # 2018-2021 ACS (5-year) uses numeric YBL codes
+        # 2018-2020 ACS (5-year) uses numeric YBL codes
         # For recently built (2010+), codes are 14 onward
         # Max code depends on survey end year
-        max_code = min(14 + (survey_year - 2010), 25)  # 2010=14, caps at 25 (2021)
+        max_code = min(14 + (survey_year - 2010), 24)  # 2010=14, caps at 24 (2020)
         return list(range(14, max_code + 1))
 
     elif survey_year >= 2014:

@@ -49,8 +49,10 @@ def get_pums_url(state_fips: str, survey_year: int, file_type: str = "h") -> str
         Full URL to the PUMS CSV file
 
     Example URLs:
-        1-year (2000-2008):
+        1-year (2000-2006):
             https://www2.census.gov/programs-surveys/acs/data/pums/2005/csv_hri.zip
+        1-year (2007-2008):
+            https://www2.census.gov/programs-surveys/acs/data/pums/2007/1-Year/csv_hri.zip
         5-year (2009+):
             https://www2.census.gov/programs-surveys/acs/data/pums/2023/5-Year/csv_hri.zip
     """
@@ -59,8 +61,11 @@ def get_pums_url(state_fips: str, survey_year: int, file_type: str = "h") -> str
         raise ValueError(f"Unknown state FIPS: {state_fips}")
 
     if is_one_year_survey(survey_year):
-        # 1-year PUMS: files are directly in year folder
-        return f"{PUMS_BASE_URL}/{survey_year}/csv_{file_type}{state_abbr}.zip"
+        # 1-year PUMS: 2007-2008 have files in 1-Year subfolder, earlier years don't
+        if survey_year >= 2007:
+            return f"{PUMS_BASE_URL}/{survey_year}/1-Year/csv_{file_type}{state_abbr}.zip"
+        else:
+            return f"{PUMS_BASE_URL}/{survey_year}/csv_{file_type}{state_abbr}.zip"
     else:
         # 5-year PUMS: files are in 5-Year subfolder
         return f"{PUMS_BASE_URL}/{survey_year}/5-Year/csv_{file_type}{state_abbr}.zip"
