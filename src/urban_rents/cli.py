@@ -319,6 +319,48 @@ def run_panel_pipeline(args: argparse.Namespace) -> int:
     return 0
 
 
+def apply_backcast(args: argparse.Namespace) -> int:
+    """Apply hybrid backcasting methodology to enhance panel data."""
+    from urban_rents.backcast import (
+        apply_hybrid_backcast,
+        generate_methodology_report,
+    )
+    from urban_rents.config import OUTPUT_DIR
+
+    # Determine input file
+    if args.input:
+        input_path = Path(args.input)
+    else:
+        input_path = OUTPUT_DIR / "county_urban_net_returns_panel_long.parquet"
+
+    if not input_path.exists():
+        console.print(f"[red]Input file not found: {input_path}[/red]")
+        console.print("[yellow]Run 'run-panel' first to generate the base panel.[/yellow]")
+        return 1
+
+    # Determine output file
+    if args.output:
+        output_path = Path(args.output)
+    else:
+        output_path = OUTPUT_DIR / "county_urban_net_returns_panel_enhanced.parquet"
+
+    # Apply backcast
+    enhanced_panel = apply_hybrid_backcast(
+        input_path=input_path,
+        output_path=output_path,
+        anchor_year=args.anchor_year,
+        smoothing_weight=args.smoothing_weight,
+    )
+
+    # Generate methodology report
+    if args.report:
+        report_path = OUTPUT_DIR / "hybrid_methodology_report.md"
+        generate_methodology_report(enhanced_panel, report_path)
+
+    console.print("\n[bold green]Backcast completed successfully![/bold green]")
+    return 0
+
+
 def main() -> int:
     """Main entry point."""
     parser = argparse.ArgumentParser(
@@ -545,6 +587,41 @@ def main() -> int:
         help="Skip crosswalk building step",
     )
     panel_pipeline_parser.set_defaults(func=run_panel_pipeline)
+
+    # Backcast command
+    backcast_parser = subparsers.add_parser(
+        "backcast",
+        help="Apply hybrid backcasting to extend panel to 2000",
+    )
+    backcast_parser.add_argument(
+        "--input",
+        type=str,
+        help="Input panel parquet file (default: county_urban_net_returns_panel_long.parquet)",
+    )
+    backcast_parser.add_argument(
+        "--output",
+        type=str,
+        help="Output enhanced panel file (default: county_urban_net_returns_panel_enhanced.parquet)",
+    )
+    backcast_parser.add_argument(
+        "--anchor-year",
+        type=int,
+        default=2009,
+        help="Anchor year for backcasting (default: 2009, first stable 5-year estimate)",
+    )
+    backcast_parser.add_argument(
+        "--smoothing-weight",
+        type=float,
+        default=0.5,
+        help="Weight for HPI in smoothing volatile years (0-1, default: 0.5)",
+    )
+    backcast_parser.add_argument(
+        "--report",
+        action="store_true",
+        default=True,
+        help="Generate methodology report (default: True)",
+    )
+    backcast_parser.set_defaults(func=apply_backcast)
 
     args = parser.parse_args()
 
