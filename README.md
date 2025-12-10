@@ -1,6 +1,6 @@
 # Urban Net Returns
 
-County-level annualized net returns to urban land for the contiguous United States (2000-2023).
+County-level annualized net returns to urban land for the United States (2000-2023).
 
 ## Overview
 
@@ -8,6 +8,10 @@ This project constructs a **24-year panel dataset** of urban net returns at the 
 - **Census PUMS** (Public Use Microdata Sample) housing data
 - **Survey of Construction** (SOC) parameters for lot characteristics
 - **TIGER/Line shapefiles** for PUMA-to-county geographic crosswalks
+
+**Geographic Coverage:** All 50 US states plus DC (51 entities, ~3,200 counties).
+
+**Note on Alaska and Hawaii:** These states use Pacific Division (Census Division 9) SOC parameters, which may introduce measurement error due to different lot sizes and values compared to the Pacific coast states (CA, OR, WA). Alaska has particularly large geographic PUMAs due to sparse population.
 
 ### Methodology
 

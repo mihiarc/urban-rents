@@ -10,7 +10,7 @@ from matplotlib.colors import BoundaryNorm
 from rich.console import Console
 
 from urban_rents.config import (
-    CONTIGUOUS_US_FIPS,
+    ALL_US_STATES_FIPS,
     CRS_ALBERS,
     FIGURES_DIR,
     RAW_DIR,
@@ -34,8 +34,10 @@ def load_county_geometries() -> gpd.GeoDataFrame:
 
     gdf = gpd.read_file(shp_path)
 
-    # Filter to contiguous US
-    gdf = gdf[gdf["STATEFP"].isin(CONTIGUOUS_US_FIPS)].copy()
+    # Filter to US states (including Alaska and Hawaii)
+    # Note: Albers Equal Area projection is optimized for contiguous US;
+    # AK/HI will appear with some distortion on the map
+    gdf = gdf[gdf["STATEFP"].isin(ALL_US_STATES_FIPS)].copy()
 
     # Project to Albers Equal Area
     gdf = gdf.to_crs(CRS_ALBERS)

@@ -16,8 +16,8 @@ from rich.progress import (
 )
 
 from urban_rents.config import (
+    ALL_US_STATES_FIPS,
     AVAILABLE_SURVEY_YEARS,
-    CONTIGUOUS_US_FIPS,
     DEFAULT_SURVEY_YEAR,
     PUMS_BASE_URL,
     RAW_DIR,
@@ -217,7 +217,7 @@ def download_pums_housing(
     Download PUMS housing files for a specific survey year.
 
     Args:
-        state_fips: Specific state FIPS code, or None for all contiguous US
+        state_fips: Specific state FIPS code, or None for all US states
         survey_year: Survey year (2000-2008 for 1-year, 2009+ for 5-year).
                     If None, uses DEFAULT_SURVEY_YEAR.
         force: If True, re-download even if files exist
@@ -234,7 +234,7 @@ def download_pums_housing(
     pums_dir = RAW_DIR / "pums" / str(survey_year)
     pums_dir.mkdir(parents=True, exist_ok=True)
 
-    states = [state_fips] if state_fips else sorted(CONTIGUOUS_US_FIPS)
+    states = [state_fips] if state_fips else sorted(ALL_US_STATES_FIPS)
     downloaded = []
 
     period_label = get_period_label(survey_year)
@@ -278,7 +278,7 @@ def download_pums_for_panel(
 
     Args:
         survey_years: List of survey years to download (1-year: 2000-2008, 5-year: 2009+)
-        state_fips: Specific state FIPS code, or None for all contiguous US
+        state_fips: Specific state FIPS code, or None for all US states
         force: If True, re-download even if files exist
 
     Returns:
@@ -306,7 +306,7 @@ def download_puma_shapefiles(
     Download PUMA shapefiles for the appropriate vintage.
 
     Args:
-        state_fips: Specific state FIPS code, or None for all contiguous US
+        state_fips: Specific state FIPS code, or None for all US states
         survey_year: Survey year to determine PUMA vintage. If None, uses default.
         force: If True, re-download even if files exist
 
@@ -327,7 +327,7 @@ def download_puma_shapefiles(
     shp_dir = RAW_DIR / "shapefiles" / f"puma_{vintage}"
     shp_dir.mkdir(parents=True, exist_ok=True)
 
-    states = [state_fips] if state_fips else sorted(CONTIGUOUS_US_FIPS)
+    states = [state_fips] if state_fips else sorted(ALL_US_STATES_FIPS)
     downloaded = []
 
     console.print(f"[bold]Downloading {vintage} PUMA shapefiles (TIGER {tiger_year})...[/bold]")
@@ -361,7 +361,7 @@ def download_puma_shapefiles_for_panel(
 
     Args:
         survey_years: List of survey years in the panel
-        state_fips: Specific state FIPS code, or None for all contiguous US
+        state_fips: Specific state FIPS code, or None for all US states
         force: If True, re-download even if files exist
 
     Returns:
@@ -469,7 +469,7 @@ def download_panel_data(
 
     Args:
         survey_years: List of survey end years to include in panel
-        state_fips: Specific state FIPS code, or None for all contiguous US
+        state_fips: Specific state FIPS code, or None for all US states
         force: If True, re-download all files
 
     Returns:

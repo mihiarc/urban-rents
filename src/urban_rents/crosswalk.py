@@ -9,7 +9,7 @@ from rich.console import Console
 from rich.progress import track
 
 from urban_rents.config import (
-    CONTIGUOUS_US_FIPS,
+    ALL_US_STATES_FIPS,
     CRS_ALBERS,
     DEFAULT_SURVEY_YEAR,
     PROCESSED_DIR,
@@ -139,8 +139,8 @@ def load_county_shapefile(tiger_year: int | None = None) -> gpd.GeoDataFrame:
     gdf["state_fips"] = gdf["state_fips"].astype(str).str.zfill(2)
     gdf["county_fips"] = gdf["county_fips"].astype(str).str.zfill(3)
 
-    # Filter to contiguous US
-    gdf = gdf[gdf["state_fips"].isin(CONTIGUOUS_US_FIPS)].copy()
+    # Filter to US states (including Alaska and Hawaii)
+    gdf = gdf[gdf["state_fips"].isin(ALL_US_STATES_FIPS)].copy()
 
     return gdf
 
@@ -234,7 +234,7 @@ def build_crosswalk_for_state(
 
 def build_full_crosswalk(survey_year: int | None = None) -> pd.DataFrame:
     """
-    Build PUMA-to-county crosswalk for all contiguous US states.
+    Build PUMA-to-county crosswalk for all US states (including Alaska and Hawaii).
 
     Args:
         survey_year: Survey year to determine PUMA vintage. If None, uses default.
@@ -255,7 +255,7 @@ def build_full_crosswalk(survey_year: int | None = None) -> pd.DataFrame:
     county_gdf = county_gdf.to_crs(CRS_ALBERS)  # Project to equal-area for accurate calculations
 
     all_crosswalks = []
-    states = sorted(CONTIGUOUS_US_FIPS)
+    states = sorted(ALL_US_STATES_FIPS)
 
     for state_fips in track(states, description=f"Processing {vintage} crosswalk"):
         try:

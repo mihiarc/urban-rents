@@ -1,7 +1,7 @@
 [project]
 name = "urban-rents"
 version = "0.1.0"
-description = "County-level annualized net returns to urban land for the contiguous United States"
+description = "County-level annualized net returns to urban land for the United States"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

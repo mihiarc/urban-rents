@@ -134,6 +134,11 @@ CONTIGUOUS_US_FIPS: Final[set[str]] = {
     "47", "48", "49", "50", "51", "53", "54", "55", "56",
 }
 
+# All US state FIPS codes (includes Alaska=02 and Hawaii=15)
+# Note: AK and HI use Pacific Division (9) SOC parameters which may introduce
+# measurement error due to different lot sizes and values in these states.
+ALL_US_STATES_FIPS: Final[set[str]] = CONTIGUOUS_US_FIPS | {"02", "15"}
+
 # State FIPS to abbreviation mapping
 STATE_FIPS_TO_ABBR: Final[dict[str, str]] = {
     "01": "AL", "02": "AK", "04": "AZ", "05": "AR", "06": "CA",

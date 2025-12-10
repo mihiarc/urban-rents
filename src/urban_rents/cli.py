@@ -364,7 +364,7 @@ def apply_backcast(args: argparse.Namespace) -> int:
 def main() -> int:
     """Main entry point."""
     parser = argparse.ArgumentParser(
-        description="Calculate county-level urban net returns for the contiguous US",
+        description="Calculate county-level urban net returns for the United States",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(

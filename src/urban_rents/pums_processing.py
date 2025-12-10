@@ -8,8 +8,8 @@ from rich.console import Console
 from rich.progress import track
 
 from urban_rents.config import (
+    ALL_US_STATES_FIPS,
     AVAILABLE_SURVEY_YEARS,
-    CONTIGUOUS_US_FIPS,
     DEFAULT_SURVEY_YEAR,
     PROCESSED_DIR,
     PUMSVariables,
@@ -442,7 +442,7 @@ def calculate_puma_property_values(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_all_states(survey_year: int | None = None) -> pd.DataFrame:
     """
-    Process PUMS data for all contiguous US states for a specific survey year.
+    Process PUMS data for all US states (including Alaska and Hawaii) for a specific survey year.
 
     Args:
         survey_year: Survey year (2000-2008 for 1-year, 2009+ for 5-year).
@@ -461,7 +461,7 @@ def process_all_states(survey_year: int | None = None) -> pd.DataFrame:
     puma_vintage = get_puma_vintage(survey_year)
     survey_type = get_survey_type_label(survey_year)
 
-    states = sorted(CONTIGUOUS_US_FIPS)
+    states = sorted(ALL_US_STATES_FIPS)
     console.print(f"[bold]Processing PUMS data for {len(states)} states ({period_label}, {survey_type})...[/bold]")
 
     for state_fips in track(states, description=f"Processing {period_label}"):
