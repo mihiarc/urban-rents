@@ -32,6 +32,12 @@ def download_data(args: argparse.Namespace) -> int:
         download_puma_shapefiles(state_fips=args.state, survey_year=survey_year, force=args.force)
     elif args.type == "county":
         download_county_shapefile(force=args.force)
+    elif args.type == "panel":
+        # Download all data for full_annual preset (all years 2000-2023)
+        preset = getattr(args, "preset", "full_annual")
+        survey_years = RECOMMENDED_PANEL_YEARS.get(preset, RECOMMENDED_PANEL_YEARS["full_annual"])
+        console.print(f"[bold]Downloading panel data for {len(survey_years)} years ({preset} preset)...[/bold]")
+        download_panel_data(survey_years=survey_years, state_fips=args.state, force=args.force)
     else:
         console.print(f"[red]Unknown data type: {args.type}[/red]")
         return 1
@@ -379,8 +385,8 @@ def main() -> int:
     download_parser = subparsers.add_parser("download", help="Download required data")
     download_parser.add_argument(
         "type",
-        choices=["all", "pums", "puma", "county"],
-        help="Type of data to download",
+        choices=["all", "pums", "puma", "county", "panel"],
+        help="Type of data to download (panel downloads all years for full_annual preset)",
     )
     download_parser.add_argument(
         "--state",
@@ -392,6 +398,12 @@ def main() -> int:
         type=int,
         default=DEFAULT_SURVEY_YEAR,
         help=f"Survey year (default: {DEFAULT_SURVEY_YEAR})",
+    )
+    download_parser.add_argument(
+        "--preset",
+        choices=["standard", "extended", "full_annual", "maximum", "milestones", "five_year_only"],
+        default="full_annual",
+        help="Panel preset for 'panel' type (default: full_annual)",
     )
     download_parser.add_argument(
         "--force",
